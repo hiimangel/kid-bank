@@ -35,4 +35,8 @@ public class TransactionCommand {
   public LocalDateTime getDateAsLocalDateTime() {
     return DateFormatting.fromBrowserDate(date);
   }
+  public String getDescription() {
+    return description;
+}
+
 }

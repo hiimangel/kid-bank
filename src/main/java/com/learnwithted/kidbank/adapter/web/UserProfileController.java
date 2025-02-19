@@ -1,8 +1,8 @@
 package com.learnwithted.kidbank.adapter.web;
 
-import com.learnwithted.kidbank.app.Welcomer;
-import com.learnwithted.kidbank.domain.UserProfile;
-import com.learnwithted.kidbank.domain.UserProfileRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.learnwithted.kidbank.app.Welcomer;
+import com.learnwithted.kidbank.domain.UserProfile;
+import com.learnwithted.kidbank.domain.UserProfileRepository;
 
 @Controller
 @RequestMapping(UserProfileController.USERS_URL)

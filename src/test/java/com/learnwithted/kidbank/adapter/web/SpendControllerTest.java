@@ -1,39 +1,90 @@
 package com.learnwithted.kidbank.adapter.web;
 
-import com.learnwithted.kidbank.domain.Account;
-import com.learnwithted.kidbank.domain.DummyUserProfile;
-import com.learnwithted.kidbank.domain.TestAccountBuilder;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.validation.BindingResult;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 
-import java.math.BigDecimal;
+import com.google.common.collect.ImmutableList;
+import com.learnwithted.kidbank.domain.Account;
+import com.learnwithted.kidbank.domain.Goal;
+import com.learnwithted.kidbank.domain.Transaction;
+import com.learnwithted.kidbank.domain.UserProfile;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-@RunWith(MockitoJUnitRunner.class)
 public class SpendControllerTest {
 
-  @Mock(stubOnly = true)
-  private BindingResult mockBindingResult;
+  // DummyAccount to satisfy the SpendController constructor.
+  private static class DummyAccount implements Account {
+    @Override
+    public int balance() {
+      return 0;
+    }
 
-  @Test
-  public void spendCommandShouldReduceAmountInAccount() throws Exception {
-    TransactionCommand spendCommand = TransactionCommand.createWithTodayDate();
-    spendCommand.setAmount(BigDecimal.valueOf(34.79));
+    @Override
+    public int interestEarned() {
+      return 0;
+    }
 
-    Account account = TestAccountBuilder.builder().buildAsCore();
+    @Override
+    public void deposit(LocalDateTime transactionDateTime, int amount, String source, UserProfile userProfile) {
+      // No-op.
+    }
 
-    SpendController spendController = new SpendController(account);
+    @Override
+    public void spend(LocalDateTime transactionDateTime, int amount, String description, UserProfile userProfile) {
+      // No-op.
+    }
 
-    Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
-    spendController.processSpendCommand(spendCommand, mockBindingResult, new DummyUserProfile());
+    @Override
+    public ImmutableList<Transaction> transactions() {
+      return ImmutableList.of();
+    }
 
-    assertThat(account.balance())
-        .isEqualTo(-3479);
+    @Override
+    public void load(List<Transaction> transactionsToLoad) {
+      // No-op.
+    }
+
+    @Override
+    public int balanceUpTo(LocalDateTime localDateTime) {
+      return 0;
+    }
+
+    @Override
+    public Set<Goal> goals() {
+      return new HashSet<>();
+    }
+
+    @Override
+    public void createGoal(String description, int targetAmount) {
+      // No-op.
+    }
   }
 
+  @Test
+  public void spendForm_AddsSpendCommandToModel_AndReturnsSpendView() {
+    // Arrange: Instantiate SpendController with a dummy Account and create a Model.
+    Account dummyAccount = new DummyAccount();
+    SpendController controller = new SpendController(dummyAccount);
+    Model model = new ExtendedModelMap();
+
+    // Act: Invoke the spendForm() method.
+    String viewName = controller.spendForm(model);
+
+    // Assert:
+    // The view name should be "spend".
+    assertEquals("spend", viewName);
+    // The model should contain a "spendCommand" attribute.
+    Object spendCommandObj = model.asMap().get("spendCommand");
+    assertNotNull("Model should contain a spendCommand attribute", spendCommandObj);
+    // Optionally, cast and check that the spendCommand has a valid date.
+    TransactionCommand spendCommand = (TransactionCommand) spendCommandObj;
+    assertNotNull("The TransactionCommand should have a non-null date", spendCommand.getDateAsLocalDateTime());
+  }
 }

@@ -21,19 +21,36 @@ public class DepositControllerTest {
   private BindingResult mockBindingResult;
 
   @Test
-  public void depositCommandShouldAddAmountToAccount() throws Exception {
+  public void depositCommandShouldAddAmountToAccount() {
+    // Arrange
     TransactionCommand depositCommand = TransactionCommand.createWithTodayDate();
     depositCommand.setAmount(BigDecimal.valueOf(12.34));
-
     Account account = TestAccountBuilder.builder().buildAsCore();
-
     DepositController depositController = new DepositController(account);
 
+    // Act
     Mockito.when(mockBindingResult.hasErrors()).thenReturn(false);
     depositController.processDepositCommand(depositCommand, mockBindingResult, new DummyUserProfile());
 
-    assertThat(account.balance())
-        .isEqualTo(1234);
+    // Assert
+    assertThat(account.balance()).isEqualTo(1234);
   }
+
+  @Test
+  public void depositCommandShouldNotModifyBalanceIfErrorsExist() {
+    // Arrange
+    TransactionCommand depositCommand = TransactionCommand.createWithTodayDate();
+    depositCommand.setAmount(BigDecimal.valueOf(10.00));
+    Account account = TestAccountBuilder.builder().buildAsCore();
+    DepositController depositController = new DepositController(account);
+
+    // Act
+    Mockito.when(mockBindingResult.hasErrors()).thenReturn(true);
+    depositController.processDepositCommand(depositCommand, mockBindingResult, new DummyUserProfile());
+
+    // Assert
+    assertThat(account.balance()).isEqualTo(0); // Expect no changes
+  }
+
 
 }
