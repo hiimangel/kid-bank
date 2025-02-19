@@ -14,8 +14,8 @@ public class WelcomeController {
 
   @GetMapping("/")
   public String welcome(Model model) {
-    model.addAttribute("commitIdShort", gitProperties.getShortCommitId());
-    model.addAttribute("commitTime", gitProperties.getCommitTime());
+   // model.addAttribute("commitIdShort", gitProperties.getShortCommitId());
+    // model.addAttribute("commitTime", gitProperties.getCommitTime());
     return "welcome";
   }
 
